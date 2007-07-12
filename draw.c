@@ -16,7 +16,7 @@
  *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "tetris.h"
+#include "yatch.h"
 #include "SDL.h"
 #include "SDL_ttf.h"
 
