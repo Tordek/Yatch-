@@ -1,0 +1,33 @@
+    This file is part of Yatch! - Yet Another Tetris Clone, Huh?.
+
+
+Yatch - Yet Another Tetris Clone, Huh?
+
+This is just a simple initial version. It can be compiled just plainly calling make:
+
+$ make
+
+There are NO options.
+
+NOTE: You need a font named font.ttf in the same directory as the files. One is not
+provided for legal reasons.
+
+Please enjoy, and support the project.
+
+
+
+Copyright 2007 Guillermo Freschi
+
+    Yatch! is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 3 of the License, or
+    (at your option) any later version.
+
+    Yatch! is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ 
