@@ -23,7 +23,7 @@
 #define SCREEN_WIDTH 640
 #define SCREEN_HEIGHT 480
 
-SDL_Surface *screen, *fondo, *temp, *blockpicture[18];
+SDL_Surface *screen, *fondo, *blockpicture[18];
 TTF_Font *fuente;
 SDL_Rect src, dest;
 
@@ -61,15 +61,18 @@ int InitTTF() {
 }
 
 int Init(){
-	if(!InitVideo( (SDL_DOUBLEBUF | SDL_ANYFORMAT))){
+	if(!InitVideo(SDL_DOUBLEBUF | SDL_ANYFORMAT)) {
 		return 0;
 	}
 	if(!InitTTF()) {
 		return 0;
 	}
+
 	int i;
 	char name[20];
-	for(i = 1; i < 9; ++i) {
+	SDL_Surface *temp;
+
+	for(i = 1; i < 8; ++i) {
 		sprintf(name, "images/bloque%d.bmp", i);
 		temp = SDL_LoadBMP(name);
 		if (temp == NULL) {
@@ -77,17 +80,16 @@ int Init(){
 			return 0;
 		}
 		blockpicture[i] = SDL_DisplayFormat(temp);
+		SDL_SetAlpha(temp,SDL_SRCALPHA,128);
+		blockpicture[i+10] = SDL_DisplayFormat(temp);
 	}
 
-	for(i = 11; i < 18; ++i) {
-		sprintf(name, "images/bloque%d.bmp", i);
-		temp = SDL_LoadBMP(name);
-		if (temp == NULL) {
-			printf("Unable to load bitmap: %s\n", SDL_GetError());
-			return 0;
-		}
-		blockpicture[i] = SDL_DisplayFormat(temp);
+	temp = SDL_LoadBMP("images/bloque8.bmp");
+	if (temp == NULL) {
+		printf("Unable to load bitmap: %s\n", SDL_GetError());
+		return 0;
 	}
+	blockpicture[i] = SDL_DisplayFormat(temp);
 
 	temp = SDL_LoadBMP("images/fondo.bmp");
 	if (temp == NULL) {
@@ -185,4 +187,5 @@ void paintpiece(int x, int y, int color){
 	dest.y = y * (blockpicture[color]->h);
 	SDL_BlitSurface(blockpicture[color], &src, screen, &dest);
 }
+
 
