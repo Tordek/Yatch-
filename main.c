@@ -224,7 +224,7 @@ int checkfield(FIELD *field) {
 			campo = 1;
 	}
 	for (i = 0; i < FIELDWIDTH; ++i)
-		if ((*field)[1][i])
+		if ((*field)[OFFSET][i])
 			return -1;
 	return lineas;
 }
@@ -372,7 +372,8 @@ int singleplayer(){
 			}
 		}
 		if(timer < SDL_GetTicks()){
-			movepiece(&field, &block, &hold, &next, SDLK_DOWN);
+			if(movepiece(&field, &block, &hold, &next, SDLK_DOWN) == -1)
+				return 0;
 			draw(&field, &block, &next, &hold, puntos);
 			timer = SDL_GetTicks() + speed;
 		}
