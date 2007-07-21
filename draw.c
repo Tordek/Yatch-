@@ -72,7 +72,7 @@ int Init(){
 	char name[20];
 	SDL_Surface *temp;
 
-	for(i = 1; i < 8; ++i) {
+	for(i = 0; i < 7; ++i) {
 		sprintf(name, "images/bloque%d.bmp", i);
 		temp = SDL_LoadBMP(name);
 		if (temp == NULL) {
@@ -84,7 +84,7 @@ int Init(){
 		blockpicture[i+10] = SDL_DisplayFormat(temp);
 	}
 
-	temp = SDL_LoadBMP("images/bloque8.bmp");
+	temp = SDL_LoadBMP("images/bloque7.bmp");
 	if (temp == NULL) {
 		printf("Unable to load bitmap: %s\n", SDL_GetError());
 		return 0;
@@ -131,36 +131,37 @@ void draw(FIELD *field, BLOCK *block, BLOCK *next, BLOCK *hold, int score) {
 
 	SDL_BlitSurface(fondo, &src, screen, &dest);
 
-
-	int offset = (FIELDHEIGHT - VISIBLEHEIGHT);
-
-	for (j = offset; j < FIELDHEIGHT; ++j)
-		for (i = 0; i < FIELDWIDTH; ++i)
-			if((*field)[j][i])
-				paintpiece(i,j - offset,8);
+	for (i = OFFSET; i < FIELDHEIGHT; ++i)
+		for (j = 0; j < FIELDWIDTH; ++j)
+			if((*field)[i][j])
+				paintpiece(j,i - OFFSET,7);
 
 	BLOCK tempblock = getghostpiece(field,block);
 
+	//Draw Ghost Piece
 	for (i = 0; i < 4; ++i)
 		for (j = 0; j < 4; ++j)
-			if(blocks[tempblock.blocktype][tempblock.orient][j][i])
-				paintpiece(i + tempblock.posx, j + tempblock.posy - offset, blocks[tempblock.blocktype][tempblock.orient][j][i]+10);
+			if(blocks[tempblock.blocktype][tempblock.orient][i][j])
+				paintpiece(j + tempblock.posx, i + tempblock.posy - OFFSET, tempblock.blocktype + 10 );
 
+	//Draw Main Piece
 	for (i = 0; i < 4; ++i)
 		for (j = 0; j < 4; ++j)
-			if(blocks[block->blocktype][block->orient][j][i])
-				paintpiece(i + block->posx,j + block->posy - offset,blocks[block->blocktype][block->orient][j][i]);
+			if(blocks[block->blocktype][block->orient][i][j])
+				paintpiece(j + block->posx, i + block->posy - OFFSET, block->blocktype );
 
+	//Draw Next Piece
 	for (i = 0; i < 4; ++i)
 		for (j = 0; j < 4; ++j)
-			if(blocks[next->blocktype][next->orient][j][i])
-				paintpiece(i + next->posx + 10, j + next->posy + 2, blocks[next->blocktype][next->orient][j][i]);
+			if(blocks[next->blocktype][next->orient][i][j])
+				paintpiece(j + next->posx + 10, i + next->posy + 2, next->blocktype );
 
+	//Draw Held Piece
 	if (hold->blocktype != -1) {
 		for (i = 0; i < 4; ++i)
 			for (j = 0; j < 4; ++j)
-				if(blocks[hold->blocktype][hold->orient][j][i])
-					paintpiece(i + hold->posx + 10,j + hold->posy + 7, blocks[hold->blocktype][hold->orient][j][i]);
+				if(blocks[hold->blocktype][hold->orient][i][j])
+					paintpiece(j + hold->posx + 10, i + hold->posy + 7, hold->blocktype );
 	}
 
 	sprintf(texto,"Score: %d",score);

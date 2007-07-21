@@ -202,42 +202,43 @@ void putpiece(FIELD *field, BLOCK *block) {
 	int i, j;
 	for (i = 0; i < 4; ++i)
 		for (j = 0; j < 4; ++j)
-			(*field)[j + block->posy][i + block->posx] |= 
-				blocks[block->blocktype][block->orient][j][i];
+			(*field)[i + block->posy][j + block->posx] |= 
+				blocks[block->blocktype][block->orient][i][j];
 }
 
+//Cleans completed lines and returns how many it removed, and -1.
+//Might be doing too much.
 int checkfield(FIELD *field) {
-	int i, j, k, lineas = 0;
-	int campo = 1;
-	for (j = 0; j < FIELDHEIGHT; ++j) {
-		for (i = 0; i < FIELDWIDTH; ++i)
-			if(!(*field)[j][i]){
-				campo = 0;
+	int i, j, k, lines = 0;
+	int fullline = 1;
+	for (i = 0; i < FIELDHEIGHT; ++i) {
+		for (j = 0; j < FIELDWIDTH; ++j)
+			if(!(*field)[i][j]){
+				fullline = 0;
 				break;
 			}
-		if(campo){
-			lineas++;
-			for (k = j; k > 0 ; k--)
-				for (i = 0; i < FIELDWIDTH; ++i)
-					(*field)[k][i] = (*field)[k-1][i];
+		if(fullline) {
+			lines++;
+			for (k = i; k > 0; --k)
+				for (j = 0; j < FIELDWIDTH; ++j)
+					(*field)[k][j] = (*field)[k-1][j];
 		} else
-			campo = 1;
+			fullline = 1;
 	}
 	for (i = 0; i < FIELDWIDTH; ++i)
 		if ((*field)[OFFSET][i])
 			return -1;
-	return lineas;
+	return lines;
 }
 
 int obstructed(FIELD *field, BLOCK *block) {
 	int i, j;
 	for (i = 0; i < 4; ++i)
 		for (j = 0; j < 4; ++j)
-			if ((blocks[block->blocktype][block->orient][j][i])
-					&&	(j + block->posy > (FIELDHEIGHT - 1)
-					   	|| i + block->posx < 0
-					   	|| i + block->posx > (FIELDWIDTH - 1)
-					   	|| (*field)[block->posy + j][block->posx + i]))
+			if ((blocks[block->blocktype][block->orient][i][j])
+					&&	(i + block->posy > (FIELDHEIGHT - 1)
+					   	|| j + block->posx < 0 || j + block->posx > (FIELDWIDTH - 1)
+					   	|| (*field)[block->posy + i][block->posx + j]))
 				return 1;
 	return 0;
 }
