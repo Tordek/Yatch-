@@ -174,7 +174,7 @@ TETRISBLOCK b7[4] = {
 		{0, 7, 7, 0}, 
 		{0, 0, 0, 0}, 
 		{0, 0, 0, 0}
-	},{
+	}, {
 		{0, 0, 7, 0}, 
 		{0, 7, 7, 0}, 
 		{0, 7, 0, 0}, 
@@ -200,46 +200,50 @@ int randomnum(int n) {
 
 void putpiece(FIELD *field, BLOCK *block) {
 	int i, j;
-	for (i = 0; i < 4; ++i)
-		for (j = 0; j < 4; ++j)
+	for (i = 0; i < 4; ++i) {
+		for (j = 0; j < 4; ++j) {
 			(*field)[i + block->posy][j + block->posx] |= 
 				blocks[block->blocktype][block->orient][i][j];
+		}
+	}
 }
 
-//Cleans completed lines and returns how many it removed, and -1.
-//Might be doing too much.
 int checkfield(FIELD *field) {
 	int i, j, k, lines = 0;
 	int fullline = 1;
 	for (i = 0; i < FIELDHEIGHT; ++i) {
-		for (j = 0; j < FIELDWIDTH; ++j)
+		for (j = 0; j < FIELDWIDTH; ++j) {
 			if(!(*field)[i][j]){
 				fullline = 0;
 				break;
 			}
+		}
 		if(fullline) {
 			lines++;
-			for (k = i; k > 0; --k)
-				for (j = 0; j < FIELDWIDTH; ++j)
+			for (k = i; k > 0; --k) {
+				for (j = 0; j < FIELDWIDTH; ++j) {
 					(*field)[k][j] = (*field)[k-1][j];
-		} else
+				}
+			}
+		} else {
 			fullline = 1;
+		}
 	}
-	for (i = 0; i < FIELDWIDTH; ++i)
-		if ((*field)[OFFSET][i])
-			return -1;
 	return lines;
 }
 
 int obstructed(FIELD *field, BLOCK *block) {
 	int i, j;
-	for (i = 0; i < 4; ++i)
-		for (j = 0; j < 4; ++j)
+	for (i = 0; i < 4; ++i) {
+		for (j = 0; j < 4; ++j) {
 			if ((blocks[block->blocktype][block->orient][i][j])
 					&&	(i + block->posy > (FIELDHEIGHT - 1)
 					   	|| j + block->posx < 0 || j + block->posx > (FIELDWIDTH - 1)
-					   	|| (*field)[block->posy + i][block->posx + j]))
+					   	|| (*field)[block->posy + i][block->posx + j])) {
 				return 1;
+			}
+		}
+	}
 	return 0;
 }
 
@@ -256,86 +260,71 @@ void cleanfield(FIELD *field) {
 
 BLOCK getghostpiece(FIELD *field, BLOCK *block){
 	BLOCK tempblock = *block;
-	while(!obstructed(field,&tempblock))
+	while(!obstructed(field, &tempblock)) {
 		tempblock.posy++;
+	}
 	tempblock.posy--;
 	return tempblock;
 }
 
-int movepiece(FIELD *field, BLOCK *block, BLOCK *hold, BLOCK *next, int tecla){
-	int nextblock=0;
-	static int canhold=1;
+void droppiece(FIELD *field, BLOCK *block) {
 	BLOCK tempblock = *block;
+	tempblock = getghostpiece(field, block);
+	*block = tempblock;
+}
 
-	switch(tecla) {
-		case SDLK_w:
-			if(canhold) {
-				BLOCK temp = *block;
-				if(hold->blocktype != -1) {
-					tempblock = *hold;
-				} else {
-					tempblock = *next;
-					createblock(next, randomnum(7));
-				}
-				createblock(hold, temp.blocktype);
-				canhold = 0;
-			}
-			break;
-
-		case SDLK_UP:
-			tempblock = getghostpiece(field,block);
-			putpiece(field,&tempblock);
-			nextblock = 1;
-			break;
-
-		case SDLK_DOWN:
-			tempblock.posy++;
-			if(obstructed(field,&tempblock)){
-				putpiece(field,block);
-				nextblock = 1;
-			}
-			break;
-
-		case SDLK_LEFT:
-			tempblock.posx--;
-			break;
-
-		case SDLK_RIGHT:
-			tempblock.posx++;
-			break;
-
-		case SDLK_a:
-			tempblock.orient = (tempblock.orient + 3) % 4;
-			break;
-
-		case SDLK_s:
-			tempblock.orient = (tempblock.orient + 1) % 4;
-			break;
-
-		default:
-			break;
+int movedown(FIELD *field, BLOCK *block){
+	BLOCK tempblock = *block;
+	tempblock.posy++;
+	if(obstructed(field, &tempblock)){
+		return -1;
 	}
+	*block = tempblock;
+	return 0;
+}
+
+void movepiece(FIELD *field, BLOCK *block, int direction){
+	BLOCK tempblock = *block;
+	tempblock.posx += direction;	
+	if (!obstructed(field, &tempblock)) {
+		*block = tempblock;
+	}
+}
+
+void rotatepiece (FIELD *field, BLOCK *block, int direction) {
+	BLOCK tempblock = *block;
 	
+	if(direction == 1) {
+		tempblock.orient = (tempblock.orient + 3) % 4;
+	} else {
+		tempblock.orient = (tempblock.orient + 1) % 4;
+	}
 	
 	if (!obstructed(field, &tempblock)) {
 		*block = tempblock;
-	} else if(nextblock){
-		*block = *next;
+	}
+}
+
+void holdpiece(BLOCK *block, BLOCK *hold, BLOCK *next) {
+	BLOCK tempblock = *block;
+	BLOCK temp = *block;
+	
+	if(hold->blocktype != -1) {
+		tempblock = *hold;
+	} else {
+		tempblock = *next;
 		createblock(next, randomnum(7));
-		canhold = 1;
-	} else 
-
-	if(obstructed(field, next))
-		return -1;
-
-	return checkfield(field);
+	}
+	
+	createblock(hold, temp.blocktype);
+	*block = tempblock;
 }
 
 int singleplayer(){
 	FIELD field;
 	BLOCK block, hold, next;
 	SDL_Event keyevent;
-	int jugando=1, nivel, tecla, temp, puntos=0, lineas=0;
+	int jugando = 1, nivel, tecla, temp, puntos = 0, lineas = 0, canhold = 1, solidify;
 	Uint32 speed=800, timer;
 
 	srand (time (NULL));
@@ -352,40 +341,91 @@ int singleplayer(){
 	createblock(&hold, -1);
 
 	draw(&field, &block, &next, &hold, puntos);
-	while(jugando){
-		while(SDL_PollEvent(&keyevent)) {
-			if(keyevent.type == SDL_KEYDOWN) {
-				tecla = keyevent.key.keysym.sym;
-				if(tecla == SDLK_p) {
-					return 0;
-				}
-				if((temp  = movepiece(&field, &block, &hold, &next, tecla)) == -1)
-					return 0;
-				if(tecla == SDLK_UP || tecla == SDLK_DOWN)
-					timer = SDL_GetTicks() + speed;
-				puntos += temp*temp;
-				lineas += temp;
-				if(lineas > nivel*10){
-					++nivel;
-					speed-=18;
-				}
-				draw(&field, &block, &next, &hold, puntos);
-			}
+	
+	while(jugando) {
+		tecla = 0;
+		solidify = 0;
+		
+		if(timer < SDL_GetTicks()) {
+			tecla = SDLK_DOWN;
+		} else if(SDL_PollEvent(&keyevent) && keyevent.type == SDL_KEYDOWN) {
+			tecla = keyevent.key.keysym.sym;
 		}
-		if(timer < SDL_GetTicks()){
-			if(movepiece(&field, &block, &hold, &next, SDLK_DOWN) == -1)
-				return 0;
-			draw(&field, &block, &next, &hold, puntos);
+		
+		switch(tecla) {
+		case SDLK_ESCAPE:
+			jugando = 0;
+			break;
+		
+		case SDLK_w:
+			if(canhold) {
+				holdpiece(&block, &hold, &next);
+				canhold = 0;
+			}
+			break;
+			
+		case SDLK_LEFT:
+			movepiece(&field, &block, -1);
+			break;
+			
+		case SDLK_RIGHT:
+			movepiece(&field, &block,  1);
+			break;
+			
+		case SDLK_a:
+			rotatepiece(&field, &block, -1);
+			break;
+			
+		case SDLK_s:
+			rotatepiece(&field, &block,  1);
+			break;
+			
+		case SDLK_DOWN:
 			timer = SDL_GetTicks() + speed;
+			if(movedown(&field, &block) == -1) {
+				solidify = 1;
+			}
+			break;
+			
+		case SDLK_UP:
+			timer = SDL_GetTicks() + speed;	
+			droppiece(&field, &block);
+			solidify = 1;
+			break;
+			
+		default:
+			break;
+		}
+		
+		if (tecla) {
+			if(solidify) {
+				putpiece(&field, &block);
+				block = next;
+				createblock(&next, randomnum(7));
+				
+				temp = checkfield(&field);
+				puntos += temp * temp;
+				lineas += temp;
+				canhold = 1;
+				
+				if(lineas > nivel * 10){
+					++nivel;
+					speed -= 18;
+				}
+				
+				if(obstructed(&field, &next)) {
+					jugando = 0;
+					break;
+				}
+			}
+			draw(&field, &block, &next, &hold, puntos);
 		}
 	}
-	return 0;
+	
+	return puntos;
 }
 
-int multiplayer(){
-
-}
 int main() {
-	singleplayer();
+	printf("%d\n",singleplayer());
 	return 0;
 }
