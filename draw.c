@@ -27,7 +27,7 @@ SDL_Surface *screen, *fondo, *blockpicture[18];
 TTF_Font *fuente;
 SDL_Rect src, dest;
 
-void paintpiece(int x, int y, int color);
+void paintpiece(int x, int y, int color, int x_offset, int y_offset);
 
 int InitVideo(Uint32 flags) {
 	if (SDL_Init(SDL_INIT_VIDEO) != 0) {
@@ -112,6 +112,18 @@ int Init(){
 	return 1;
 }
 
+void draw_block(BLOCK *block, int x_offset, int y_offset, int color) {
+	int i, j;
+
+	for (i = 0; i < 4; ++i) {
+		for (j = 0; j < 4; ++j) {
+			if(blocks[block->blocktype][block->orient][i][j]) {
+				paintpiece(j + block->posx, i + block->posy - OFFSET, block->blocktype + color, x_offset, y_offset);
+			}
+		}
+	}
+}
+
 void draw(FIELD *field, BLOCK *block, BLOCK *next, BLOCK *hold, int score) {
 	int i, j;
 	SDL_Rect src, dest;
@@ -134,34 +146,15 @@ void draw(FIELD *field, BLOCK *block, BLOCK *next, BLOCK *hold, int score) {
 	for (i = OFFSET; i < FIELDHEIGHT; ++i)
 		for (j = 0; j < FIELDWIDTH; ++j)
 			if((*field)[i][j])
-				paintpiece(j,i - OFFSET,7);
+				paintpiece(j, i - OFFSET, 7, 16, 0);
 
-	BLOCK tempblock = getghostpiece(field,block);
+	BLOCK ghost = get_ghost_piece(field,block);
 
-	//Draw Ghost Piece
-	for (i = 0; i < 4; ++i)
-		for (j = 0; j < 4; ++j)
-			if(blocks[tempblock.blocktype][tempblock.orient][i][j])
-				paintpiece(j + tempblock.posx, i + tempblock.posy - OFFSET, tempblock.blocktype + 10 );
-
-	//Draw Main Piece
-	for (i = 0; i < 4; ++i)
-		for (j = 0; j < 4; ++j)
-			if(blocks[block->blocktype][block->orient][i][j])
-				paintpiece(j + block->posx, i + block->posy - OFFSET, block->blocktype );
-
-	//Draw Next Piece
-	for (i = 0; i < 4; ++i)
-		for (j = 0; j < 4; ++j)
-			if(blocks[next->blocktype][next->orient][i][j])
-				paintpiece(j + next->posx + 10, i + next->posy + 2, next->blocktype );
-
-	//Draw Held Piece
+	draw_block(&ghost, 16, 0, 10);
+	draw_block(block, 16, 0, 0);
+	draw_block(next, 160, 32, 0);
 	if (hold->blocktype != -1) {
-		for (i = 0; i < 4; ++i)
-			for (j = 0; j < 4; ++j)
-				if(blocks[hold->blocktype][hold->orient][i][j])
-					paintpiece(j + hold->posx + 10, i + hold->posy + 7, hold->blocktype );
+		draw_block(hold, 160, 144, 0);
 	}
 
 	sprintf(texto,"Score: %d",score);
@@ -183,9 +176,9 @@ void draw(FIELD *field, BLOCK *block, BLOCK *next, BLOCK *hold, int score) {
 	SDL_Flip(screen);
 }
 
-void paintpiece(int x, int y, int color){
-	dest.x = x * (blockpicture[color]->w) + 16;
-	dest.y = y * (blockpicture[color]->h);
+void paintpiece(int x, int y, int color, int x_offset, int y_offset) {
+	dest.x = x * (blockpicture[color]->w) + x_offset;
+	dest.y = y * (blockpicture[color]->h) + y_offset;
 	SDL_BlitSurface(blockpicture[color], &src, screen, &dest);
 }
 

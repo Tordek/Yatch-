@@ -22,20 +22,15 @@
 #define PROJECTNAME "Yatch!"
 #define PROJECTVERSION 0.0.1
 
-#define UP 0
-#define DOWN 1
-#define LEFT 2
-#define RIGHT 3
-
 #define FIELDWIDTH 10
 #define FIELDHEIGHT 22
 #define VISIBLEHEIGHT 20
 #define OFFSET (FIELDHEIGHT - VISIBLEHEIGHT)
 
-#define KEY_UP 72
-#define KEY_LEFT 75
-#define KEY_RIGHT 77
-#define KEY_DOWN 80
+#define LEFT -1
+#define RIGHT 1
+#define CLOCKWISE 1
+#define COUNTERCLOCKWISE 3
 
 typedef char TETRISBLOCK[4][4];
 typedef char FIELD[FIELDHEIGHT][FIELDWIDTH];
@@ -46,19 +41,22 @@ typedef struct {
        int orient;
 } BLOCK;
 
-int randomnum(int n);
-int blockmove(FIELD *field, BLOCK *block, int direction);
-int blockturn(FIELD *field, BLOCK *block);
+int random_block();
+int move_piece(FIELD *field, BLOCK *block, int direction);
+int move_down(FIELD *field, BLOCK *block);
+void rotate_piece(FIELD *field, BLOCK *block, int direction);
+void drop_piece(FIELD *field, BLOCK *block);
+void put_piece(FIELD *field, BLOCK *block);
+int is_obstructed(FIELD *field, BLOCK *block);
 
-void putpiece(FIELD *field, BLOCK *block);
-int checkfield(FIELD *field);
+BLOCK get_ghost_piece(FIELD *field, BLOCK *block);
 
-int obstructed(FIELD *field, BLOCK *block);
+int check_field(FIELD *field);
+void clean_field(FIELD *field);
+
 void draw(FIELD *field, BLOCK *block, BLOCK *next, BLOCK *hold, int points);
 
-void createblock(BLOCK *block, int piece);
-
-BLOCK getghostpiece(FIELD *field, BLOCK *block);
+void create_block(BLOCK *block, int piece);
 
 extern TETRISBLOCK *blocks[7];
 
