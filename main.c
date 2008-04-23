@@ -54,6 +54,7 @@ int singleplayer(){
             } else if(SDL_PollEvent(&keyevent) && keyevent.type == SDL_KEYDOWN) {
                 key = keyevent.key.keysym.sym;
             }
+            SDL_Delay(30);
         }
         if (key) {
             switch(key) {
