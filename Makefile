@@ -4,11 +4,14 @@ LFLAGS+=`$(SDL_CONFIG) --libs` -lSDL_ttf -Wall
 
 EXTRACFLAGS+= -pg
 
-yatch: main.o draw.o
-	$(CC) main.o draw.o -o $@ $(LFLAGS)
+yatch: main.o draw.o game.o
+	$(CC) main.o draw.o game.o -o $@ $(LFLAGS)
 
-main: main.c tetris.h
+main: main.c yatch.h
 	$(CC) $@.c $(CFLAGS) -c
 
-draw: draw.c
+game: game.c yatch.h
+	$(CC) $@.c $(CFLAGS) -c
+
+draw: draw.c yatch.h
 	$(CC) $@.c $(CFLAGS) -c
