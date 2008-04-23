@@ -112,7 +112,7 @@ int Init(){
 	return 1;
 }
 
-void draw_block(BLOCK *block, int x_offset, int y_offset, int color) {
+void draw_block(Block *block, int x_offset, int y_offset, int color) {
 	int i, j;
 
 	for (i = 0; i < 4; ++i) {
@@ -124,7 +124,7 @@ void draw_block(BLOCK *block, int x_offset, int y_offset, int color) {
 	}
 }
 
-void draw(FIELD *field, BLOCK *block, BLOCK *next, BLOCK *hold, int score) {
+void draw(Field *field, Block *block, Block *next, Block *hold, int score) {
 	int i, j;
 	SDL_Rect src, dest;
 	SDL_Surface *imgtexto;
@@ -143,12 +143,12 @@ void draw(FIELD *field, BLOCK *block, BLOCK *next, BLOCK *hold, int score) {
 
 	SDL_BlitSurface(fondo, &src, screen, &dest);
 
-	for (i = OFFSET; i < FIELDHEIGHT; ++i)
-		for (j = 0; j < FIELDWIDTH; ++j)
+	for (i = OFFSET; i < FIELD_HEIGHT; ++i)
+		for (j = 0; j < FIELD_WIDTH; ++j)
 			if((*field)[i][j])
 				paintpiece(j, i - OFFSET, 7, 16, 0);
 
-	BLOCK ghost = get_ghost_piece(field,block);
+	Block ghost = get_ghost_piece(field,block);
 
 	draw_block(&ghost, 16, 0, 10);
 	draw_block(block, 16, 0, 0);

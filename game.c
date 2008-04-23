@@ -20,7 +20,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-TETRISBLOCK b1[4] = {
+Tetramino b1[4] = {
 	{
 		{0, 0, 0, 0}, 
 		{1, 1, 1, 1}, 
@@ -44,7 +44,7 @@ TETRISBLOCK b1[4] = {
 	}
 };
 
-TETRISBLOCK b2[4] = {
+Tetramino b2[4] = {
 	{
 		{2, 0, 0, 0}, 
 		{2, 2, 2, 0}, 
@@ -68,7 +68,7 @@ TETRISBLOCK b2[4] = {
 	}
 };
 
-TETRISBLOCK b3[4] = {
+Tetramino b3[4] = {
 	{
 		{0, 3, 3, 0}, 
 		{0, 3, 3, 0}, 
@@ -92,7 +92,7 @@ TETRISBLOCK b3[4] = {
 	}
 };
 
-TETRISBLOCK b4[4] = {
+Tetramino b4[4] = {
 	{
 		{0, 0, 4, 0}, 
 		{4, 4, 4, 0}, 
@@ -117,7 +117,7 @@ TETRISBLOCK b4[4] = {
 };
 
 
-TETRISBLOCK b5[4] = {
+Tetramino b5[4] = {
 	{
 		{0, 5, 5, 0}, 
 		{5, 5, 0, 0}, 
@@ -141,7 +141,7 @@ TETRISBLOCK b5[4] = {
 	}
 };
 
-TETRISBLOCK b6[4] = {
+Tetramino b6[4] = {
 	{
 		{0, 6, 0, 0}, 
 		{6, 6, 6, 0}, 
@@ -165,7 +165,7 @@ TETRISBLOCK b6[4] = {
 	}
 };
 
-TETRISBLOCK b7[4] = {
+Tetramino b7[4] = {
 	{
 		{7, 7, 0, 0}, 
 		{0, 7, 7, 0}, 
@@ -189,7 +189,7 @@ TETRISBLOCK b7[4] = {
 	}
 };
 
-TETRISBLOCK *blocks[7] = { b1, b2, b3, b4, b5, b6, b7 };
+Tetramino *blocks[7] = { b1, b2, b3, b4, b5, b6, b7 };
 
 
 int random_block() {
@@ -223,7 +223,7 @@ int random_block() {
     return current;
 }
 
-void lock_piece(FIELD *field, BLOCK *block) {
+void lock_piece(Field *field, Block *block) {
     int i, j;
     for (i = 0; i < 4; ++i) {
         for (j = 0; j < 4; ++j) {
@@ -233,14 +233,14 @@ void lock_piece(FIELD *field, BLOCK *block) {
     }
 }
 
-int update_field(FIELD *field) {
+int update_field(Field *field) {
     int i, j, k;
     int lines = 0;
     int is_full_line;
 
-    for (i = 0; i < FIELDHEIGHT; ++i) {
+    for (i = 0; i < FIELD_HEIGHT; ++i) {
         is_full_line = 1;
-        for (j = 0; j < FIELDWIDTH; ++j) {
+        for (j = 0; j < FIELD_WIDTH; ++j) {
             if(!(*field)[i][j]){
                 is_full_line = 0;
                 break;
@@ -250,7 +250,7 @@ int update_field(FIELD *field) {
         if(is_full_line) {
             lines++;
             for (k = i; k > 0; --k) {
-                for (j = 0; j < FIELDWIDTH; ++j) {
+                for (j = 0; j < FIELD_WIDTH; ++j) {
                     (*field)[k][j] = (*field)[k-1][j];
                 }
             }
@@ -259,14 +259,14 @@ int update_field(FIELD *field) {
     return lines;
 }
 
-int is_obstructed(FIELD *field, BLOCK *block) {
+int is_obstructed(Field *field, Block *block) {
     int i, j;
     for (i = 0; i < 4; ++i) {
         for (j = 0; j < 4; ++j) {
             if ((blocks[block->blocktype][block->orient][i][j])
-                    &&  (i + block->posy > (FIELDHEIGHT - 1)
+                    &&  (i + block->posy > (FIELD_HEIGHT - 1)
                         || j + block->posx < 0
-                        || j + block->posx > (FIELDWIDTH - 1)
+                        || j + block->posx > (FIELD_WIDTH - 1)
                         || (*field)[block->posy + i][block->posx + j])) {
                 return 1;
             }
@@ -275,19 +275,19 @@ int is_obstructed(FIELD *field, BLOCK *block) {
     return 0;
 }
 
-void create_block(BLOCK *block, int piece) {
-    block->posx = (FIELDWIDTH - 4)/2;
+void create_block(Block *block, int piece) {
+    block->posx = (FIELD_WIDTH - 4)/2;
     block->posy = OFFSET;
     block->blocktype = piece;
     block->orient = 0;
 }
 
-void clean_field(FIELD *field) {
-    memset(field, 0, FIELDHEIGHT * FIELDWIDTH);
+void clean_field(Field *field) {
+    memset(field, 0, FIELD_HEIGHT * FIELD_WIDTH);
 }
 
-BLOCK get_ghost_piece(FIELD *field, BLOCK *block){
-    BLOCK tempblock = *block;
+Block get_ghost_piece(Field *field, Block *block){
+    Block tempblock = *block;
 
     while(!is_obstructed(field, &tempblock)) {
         tempblock.posy++;
@@ -297,12 +297,12 @@ BLOCK get_ghost_piece(FIELD *field, BLOCK *block){
     return tempblock;
 }
 
-void drop_piece(FIELD *field, BLOCK *block) {
+void drop_piece(Field *field, Block *block) {
     *block = get_ghost_piece(field, block);
 }
 
-int move_down(FIELD *field, BLOCK *block){
-    BLOCK tempblock = *block;
+int move_down(Field *field, Block *block){
+    Block tempblock = *block;
     tempblock.posy++;
 
     if(is_obstructed(field, &tempblock)){
@@ -313,8 +313,8 @@ int move_down(FIELD *field, BLOCK *block){
     return 0;
 }
 
-int move_piece(FIELD *field, BLOCK *block, int direction){
-    BLOCK tempblock = *block;
+int move_piece(Field *field, Block *block, int direction){
+    Block tempblock = *block;
     tempblock.posx += direction;
 
     if (is_obstructed(field, &tempblock)) {
@@ -325,8 +325,8 @@ int move_piece(FIELD *field, BLOCK *block, int direction){
     return -1;
 }
 
-void rotate_piece (FIELD *field, BLOCK *block, int direction) {
-    BLOCK tempblock = *block;
+void rotate_piece (Field *field, Block *block, int direction) {
+    Block tempblock = *block;
     tempblock.orient = (tempblock.orient + direction) % 4;
 
     if (is_obstructed(field, &tempblock)) {
@@ -339,8 +339,8 @@ void rotate_piece (FIELD *field, BLOCK *block, int direction) {
     *block = tempblock;
 }
 
-void hold_piece(BLOCK *block, BLOCK *hold, BLOCK *next) {
-    BLOCK tempblock = *block;
+void hold_piece(Block *block, Block *hold, Block *next) {
+    Block tempblock = *block;
     int temp = block->blocktype;
 
     if(hold->blocktype != -1) {

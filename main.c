@@ -24,8 +24,8 @@
 #include "SDL.h"
 
 int singleplayer(){
-    FIELD field;
-    BLOCK block, hold, next;
+    Field field;
+    Block block, hold, next;
     SDL_Event keyevent;
     int playing = 1, level = 1, key, temp, score = 0, lines = 0, can_hold = 1, solidify;
     Uint32 speed = 800, timer;
