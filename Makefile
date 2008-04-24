@@ -15,3 +15,6 @@ game: game.c yatch.h
 
 draw: draw.c yatch.h
 	$(CC) $@.c $(CFLAGS) -c
+
+clean:
+	rm main.o draw.o game.o yatch
