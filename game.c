@@ -191,17 +191,19 @@ Tetramino b7[4] = {
 
 Tetramino *blocks[7] = { b1, b2, b3, b4, b5, b6, b7 };
 
-
+int random_number(int n) {
+	return rand() / (RAND_MAX / n + 1);
+}
 int random_block() {
     static int queue[4] = {-1, -1, -1, -1};
     int current;
     int i, j;
 
     if(queue[0] == -1) {
-        queue[0] = rand() % 7;
-        queue[1] = rand() % 7;
-        queue[2] = rand() % 7;
-        queue[3] = rand() % 7;
+        queue[0] = random_number(7);
+        queue[1] = random_number(7);
+        queue[2] = random_number(7);
+        queue[3] = random_number(7);
     }
 
     current = queue[0];
