@@ -1,19 +1,19 @@
 /* Copyright 2007 Guillermo Freschi
  *
- *     This file is part of Yatch! - Yet Another Tetris Clone, Huh?.
+ *	 This file is part of Yatch! - Yet Another Tetris Clone, Huh?.
  *
- *    Yatch! is free software; you can redistribute it and/or modify
- *    it under the terms of the GNU General Public License as published by
- *    the Free Software Foundation; either version 3 of the License, or
- *    (at your option) any later version.
+ *	Yatch! is free software; you can redistribute it and/or modify
+ *	it under the terms of the GNU General Public License as published by
+ *	the Free Software Foundation; either version 3 of the License, or
+ *	(at your option) any later version.
  *
- *    Yatch! is distributed in the hope that it will be useful,
- *    but WITHOUT ANY WARRANTY; without even the implied warranty of
- *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *    GNU General Public License for more details.
+ *	Yatch! is distributed in the hope that it will be useful,
+ *	but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *	GNU General Public License for more details.
  *
- *    You should have received a copy of the GNU General Public License
- *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *	You should have received a copy of the GNU General Public License
+ *	along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 #ifndef _yatch_h_
@@ -36,9 +36,9 @@ typedef char Tetramino[4][4];
 typedef char Field[FIELD_HEIGHT][FIELD_WIDTH];
 
 typedef struct {
-       int blocktype;
-       int posx, posy;
-       int orient;
+	int blocktype;
+	int posx, posy;
+	int orient;
 } Block;
 
 int random_block();
